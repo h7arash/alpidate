@@ -1,0 +1,1 @@
+module.exports = {  entryPoints: ['./src/alpidate.js'],  bundle: true,  minify: true,  outfile: './dist/alpidate.min.js',  format: 'iife', // باندل IIFE برای اجرا در مرورگر};
