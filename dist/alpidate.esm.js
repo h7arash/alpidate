@@ -49,7 +49,7 @@ function alpidate_default(Alpine) {
             currentModel = currentModel[upperModel];
           }
         });
-        currentVModel.invalid = false;
+        currentVModel.$invalid = false;
         rules.forEach((rule) => {
           rule = rule.split(":");
           switch (rule[0]) {
@@ -85,8 +85,8 @@ function alpidate_default(Alpine) {
               error = currentModel.length > rule[1];
               break;
           }
-          if (!currentVModel.invalid) {
-            currentVModel.invalid = error;
+          if (!currentVModel.$invalid) {
+            currentVModel.$invalid = error;
           }
           currentVModel[rule[0]] = error;
         });
