@@ -92,6 +92,9 @@ function alpidate_default(Alpine) {
         });
       });
     };
+    data.reset = () => {
+      data.$v.$touch = false;
+    };
     data.$v.$invalid = true;
     data = createValidationWatcher(data);
     data.$watch("$v", () => {
