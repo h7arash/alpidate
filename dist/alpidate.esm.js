@@ -60,6 +60,7 @@ function expandWildcardValidations(data) {
 function createValidationWatcher(data) {
   const expandedValidations = expandWildcardValidations(data);
   for (let model in expandedValidations) {
+    data.validate(model);
     data.$watch(model, () => data.validate(model));
   }
   return data;
