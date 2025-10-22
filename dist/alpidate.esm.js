@@ -110,6 +110,18 @@ function alpidate_default(Alpine) {
             );
           }
         }
+        const parts = model.split(".");
+        if (parts.length > 1) {
+          let cursor = data.$v;
+          for (let i = 0; i < parts.length - 1; i++) {
+            const segment = parts[i];
+            if (!cursor[segment])
+              continue;
+            const child = cursor[segment];
+            child.$invalid = Object.values(child).filter((v) => typeof v === "object" && v !== null).some((v) => v.$invalid);
+            cursor = child;
+          }
+        }
       });
     };
     data.$v.reset = () => data.$v.$touch = false;
