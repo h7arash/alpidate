@@ -1,5 +1,5 @@
 // src/alpidate.js
-function validateValue(value, rules) {
+function validateValue(value, rules, data) {
   const result = { $invalid: false };
   rules.forEach((r) => {
     const [rule, param] = r.split(":");
@@ -7,6 +7,13 @@ function validateValue(value, rules) {
     switch (rule) {
       case "required":
         error = value === null || value === "" || value === void 0 || Array.isArray(value) && value.length === 0;
+        break;
+      case "requiredIf":
+        const [field, expected] = param.split(",");
+        const actual = data[field];
+        const shouldBeRequired = "" + actual === expected;
+        if (shouldBeRequired)
+          error = value === null || value === "" || value === void 0;
         break;
       case "array":
         error = !Array.isArray(value);
@@ -40,68 +47,72 @@ function validateValue(value, rules) {
   });
   return result;
 }
-function expandWildcardValidations(data) {
+function expandWildcardValidations(data, validationsRules) {
   const expanded = {};
-  for (let path in data.validations) {
+  for (let path in validationsRules) {
     if (path.includes("*")) {
       const parts = path.split(".");
       let arrayKey = parts[0];
       let arr = data[arrayKey] || [];
       arr.forEach((_, idx) => {
         const expandedPath = path.replace("*", idx);
-        expanded[expandedPath] = data.validations[path];
+        expanded[expandedPath] = validationsRules[path];
       });
     } else {
-      expanded[path] = data.validations[path];
+      expanded[path] = validationsRules[path];
     }
   }
   return expanded;
 }
-function createValidationWatcher(data) {
-  const expandedValidations = expandWildcardValidations(data);
+function createValidationWatcher(data, validationsRules, key) {
+  const expandedValidations = expandWildcardValidations(data, validationsRules);
   for (let model in expandedValidations) {
-    data.validate(model);
-    data.$watch(model, () => data.validate(model));
+    data[key].validate(model);
+    data.$watch(model, () => data[key].validate(model));
   }
   return data;
 }
 function alpidate_default(Alpine) {
-  Alpine.magic("validation", () => (data) => {
-    data.$v = {};
-    data.$v.$touch = false;
-    data.$v.$invalid = true;
-    data.validate = (modelName = null) => {
-      const expandedValidations = expandWildcardValidations(data);
+  Alpine.magic("validation", () => (data, key = null) => {
+    if (!key) {
+      key = "$v";
+    }
+    data[key] = {};
+    data[key].$touch = false;
+    data[key].$invalid = true;
+    const validationsRules = JSON.parse(JSON.stringify(data.validations));
+    data[key].validate = (modelName = null) => {
+      const expandedValidations = expandWildcardValidations(data, validationsRules);
       const models = modelName ? [modelName] : Object.keys(expandedValidations);
       if (!modelName)
-        data.$v.$touch = true;
+        data[key].$touch = true;
       models.forEach((model) => {
         const rules = expandedValidations[model];
         const chain = model.split(".");
-        let currentV = data.$v;
+        let currentV = data[key];
         let currentData = data;
-        chain.forEach((key, idx) => {
-          if (!isNaN(Number(key))) {
-            currentData = currentData[key];
+        chain.forEach((key2, idx) => {
+          if (!isNaN(Number(key2))) {
+            currentData = currentData[key2];
             return;
           }
-          if (!currentV[key])
-            currentV[key] = { $invalid: false };
-          currentV = currentV[key];
-          currentData = currentData[key] ?? currentData[key];
+          if (!currentV[key2])
+            currentV[key2] = { $invalid: false };
+          currentV = currentV[key2];
+          currentData = currentData[key2] ?? currentData[key2];
         });
-        Object.assign(currentV, validateValue(currentData, rules));
+        Object.assign(currentV, validateValue(currentData, rules, data));
         if (Array.isArray(currentData)) {
-          const wildcardKey = Object.keys(data.validations).find((k) => k.includes("*") && k.startsWith(chain[0]));
+          const wildcardKey = Object.keys(validationsRules).find((k) => k.includes("*") && k.startsWith(chain[0]));
           if (wildcardKey) {
             currentV.each = currentData.map((item, idx) => {
               const itemResult = {};
-              const subRules = Object.keys(data.validations).filter((p) => p.startsWith(chain[0] + ".*")).map((p) => {
+              const subRules = Object.keys(validationsRules).filter((p) => p.startsWith(chain[0] + ".*")).map((p) => {
                 const fieldName = p.split(".").slice(-1)[0];
-                return { fieldName, rules: data.validations[p] };
+                return { fieldName, rules: validationsRules[p] };
               });
               subRules.forEach((sr) => {
-                itemResult[sr.fieldName] = validateValue(item[sr.fieldName], sr.rules);
+                itemResult[sr.fieldName] = validateValue(item[sr.fieldName], sr.rules, data);
               });
               return itemResult;
             });
@@ -112,7 +123,7 @@ function alpidate_default(Alpine) {
         }
         const parts = model.split(".");
         if (parts.length > 1) {
-          let cursor = data.$v;
+          let cursor = data[key];
           for (let i = 0; i < parts.length - 1; i++) {
             const segment = parts[i];
             if (!cursor[segment])
@@ -124,18 +135,28 @@ function alpidate_default(Alpine) {
         }
       });
     };
-    data.$v.reset = () => data.$v.$touch = false;
-    data = createValidationWatcher(data);
-    data.$watch("$v", () => {
-      data.$v.$invalid = Object.keys(data.$v).some((k) => {
+    data[key].reset = () => data[key].$touch = false;
+    data = createValidationWatcher(data, validationsRules, key);
+    data.$watch(key, () => {
+      data[key].$invalid = Object.keys(data[key]).some((k) => {
         if (k.startsWith("$"))
           return false;
-        const v = data.$v[k];
+        const v = data[key][k];
         if (v.$invalid)
           return true;
         if (v.each)
           return v.each.some((e) => Object.values(e).some((f) => f.$invalid));
         return false;
+      });
+    });
+    Object.entries(validationsRules).forEach(([field, rules]) => {
+      rules.forEach((rule) => {
+        if (rule.startsWith("requiredIf:")) {
+          const onEffectModel = rule.split(":")[1].split(",")[0];
+          data.$watch(onEffectModel, () => {
+            data[key].validate(field);
+          });
+        }
       });
     });
   });
