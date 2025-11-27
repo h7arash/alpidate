@@ -72,7 +72,7 @@ function createValidationWatcher(data, validationsRules, key) {
   }
   return data;
 }
-function alpidate_default(Alpine) {
+function alpidatePlugin(Alpine) {
   Alpine.magic("validation", () => (data, key = null) => {
     if (!key) {
       key = "$v";
@@ -161,6 +161,13 @@ function alpidate_default(Alpine) {
     });
   });
 }
+(function exposeToGlobal() {
+  const root = typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : this;
+  if (root && !root.alpidate) {
+    root.alpidate = alpidatePlugin;
+  }
+})();
+var alpidate_default = alpidatePlugin;
 export {
   alpidate_default as default
 };
