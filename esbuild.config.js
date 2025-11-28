@@ -1,1 +1,0 @@
-module.exports = {  entryPoints: ['./src/alpidate.js'],  bundle: true,  minify: true,  outfile: './dist/alpidate.min.js',  format: 'iife',  globalName: 'alpidate',};

@@ -1,1 +1,36 @@
-{  "name": "alpidate",  "version": "3.0.2",  "description": "A model-based validation plugin for Alpine.js, inspired by Vuelidate.",  "main": "dist/alpidate.min.js",  "module": "dist/alpidate.esm.js",  "repository": {    "type": "git",    "url": "https://github.com/h7arash/alpidate"  },  "keywords": [    "alpinejs",    "validation",    "plugin",    "model-based",    "vuelidate",    "alpine-validation",    "form-validation",    "alpidate"  ],  "author": "Arash Hasanzadeh",  "license": "MIT",  "devDependencies": {    "esbuild": "^0.19.12"  },  "scripts": {    "build": "esbuild src/alpidate.js --bundle --minify --global-name=alpidate --format=iife --outfile=dist/alpidate.min.js",    "build:esm": "esbuild src/alpidate.js --bundle --format=esm --outfile=dist/alpidate.esm.js"  }}
+{
+  "name": "alpidate",
+  "version": "3.0.4",
+  "description": "A model-based validation plugin for Alpine.js, inspired by Vuelidate.",
+  "main": "dist/alpidate.cjs.js",
+  "module": "dist/alpidate.esm.js",
+  "unpkg": "dist/alpidate.cdn.js",
+  "jsdelivr": "dist/alpidate.cdn.js",
+  "browser": "dist/alpidate.cdn.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/h7arash/alpidate"
+  },
+  "type": "module",
+  "keywords": [
+    "alpinejs",
+    "validation",
+    "plugin",
+    "model-based",
+    "vuelidate",
+    "alpine-validation",
+    "form-validation",
+    "alpidate"
+  ],
+  "author": "Arash Hasanzadeh",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.17.7",
+    "@babel/preset-env": "^7.16.11",
+    "esbuild": "^0.14.27",
+    "esbuild-plugin-babel": "^0.2.3"
+  },
+  "scripts": {
+    "build": "node scripts/build.js"
+  }
+}

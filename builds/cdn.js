@@ -1,0 +1,1 @@
+import alpidate from "../src/alpidate";window.alpidate = alpidate;
