@@ -1,6 +1,6 @@
 {
   "name": "alpidate",
-  "version": "3.0.4",
+  "version": "3.0.5",
   "description": "A model-based validation plugin for Alpine.js, inspired by Vuelidate.",
   "main": "dist/alpidate.cjs.js",
   "module": "dist/alpidate.esm.js",

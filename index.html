@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alpidate – Alpine.js Validation Plugin</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpidate/dist/alpidate.cdn.js"></script>
+  <script>
+    document.addEventListener('alpine:init', () => {
+      Alpine.plugin(alpidate)
+    })
+  </script>
+  <script>
+    function syntaxHighlight(json) {
+      json = json
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+      return json.replace(
+        /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+        function (match) {
+          let cls = 'number';
+          if (/^"/.test(match)) {
+            cls = /:$/.test(match) ? 'key' : 'string';
+          } else if (/true|false/.test(match)) {
+            cls = 'boolean';
+          } else if (/null/.test(match)) {
+            cls = 'null';
+          }
+          return '<span class="' + cls + '">' + match + '</span>';
+        }
+      );
+    }
+  </script>
+  <style>
+    html{
+      scroll-behavior: smooth;
+    }
+    pre {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+      line-height: .9;
+    }
+    code { font-family: monospace; font-size: 12px; }
+    .string  { color: #ce9178; }
+    .number  { color: #b5cea8; }
+    .boolean { color: #569cd6; }
+    .null    { color: #569cd6; }
+    .key     { color: #9cdcfe; }
+    .success-check {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.5); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+<!-- Hero -->
+<section class="py-32 bg-gradient-to-br from-black via-gray-900 to-gray-800 text-white text-center">
+  <div class="container mx-auto px-6 max-w-5xl">
+    <h1 class="text-5xl md:text-7xl font-black mb-8 tracking-tight leading-tight">
+      Alpidate
+    </h1>
+
+    <p class="text-2xl md:text-4xl font-light mb-6 opacity-90 leading-snug">
+      The <span class="font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">cleanest</span> validation plugin<br class="hidden md:block">
+      you’ll ever use with Alpine.js
+    </p>
+
+    <p class="text-lg md:text-xl opacity-75 mb-10 max-w-3xl mx-auto">
+      Zero dependencies • Laravel-style rules • Native array & nested support • 4 KB
+    </p>
+
+    <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
+      <a href="https://github.com/h7arash/alpidate"
+         class="px-12 py-5 bg-white text-black font-bold text-lg rounded-xl hover:bg-gray-100 transition shadow-2xl flex items-center gap-3">
+        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        Star on GitHub
+      </a>
+
+      <a href="#demo" class="px-15 py-5 border-2 border-white text-white font-bold text-lg rounded-xl hover:bg-white hover:text-black transition">
+        See it in action ↓
+      </a>
+    </div>
+
+    <pre class="mt-8 mx-auto max-w-md bg-gray-900 text-white p-3 rounded-lg text-sm font-mono inline-block">
+<code>npm i alpidate</code>
+      </pre>
+
+    <p class="mt-8 text-sm opacity-60">
+      Joining 1,200+ starred Alpine tools • Actively maintained • MIT licensed
+    </p>
+  </div>
+</section>
+
+<!-- Feature Icons -->
+<section class="py-20 bg-white">
+  <div class="container mx-auto text-center max-w-5xl">
+    <h2 class="text-4xl font-bold mb-14">Why Developers Love Alpidate</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+
+      <div class="p-8 rounded-2xl shadow bg-gray-50">
+        <h3 class="text-2xl font-semibold mb-3">⚡ Zero Dependencies</h3>
+        <p class="opacity-70">Pure JS. No weight from external packages.</p>
+      </div>
+
+      <div class="p-8 rounded-2xl shadow bg-gray-50">
+        <h3 class="text-2xl font-semibold mb-3">✨ Beautiful Syntax</h3>
+        <p class="opacity-70">rules: { email: ['required','email'] }</p>
+      </div>
+
+      <div class="p-8 rounded-2xl shadow bg-gray-50">
+        <h3 class="text-2xl font-semibold mb-3">🧩 Alpine Native</h3>
+        <p class="opacity-70">Perfect DX inside x-data / x-model.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- 5-Second Mini Form -->
+<section class="py-16 bg-gray-50">
+  <div class="container mx-auto max-w-5xl px-6">
+    <h2 class="text-4xl font-bold text-center mb-12">Try Alpidate in 5 Seconds</h2>
+    <div class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-2xl border">
+      <div x-data="{
+          form: { email: '', password: '' },
+          validations: {
+            'form.email': ['required', 'email'],
+            'form.password': ['required', 'min:8', 'max:20']
+          },
+          isValid: false,
+          init() { this.$validation(this) }
+        }">
+        <input x-model="form.email" placeholder="Email" class="w-full p-4 border rounded-lg mb-4 focus:ring-2 focus:ring-blue-500 outline-none">
+        <div x-show="$v.form.email.$invalid && $v.$touch" class="text-red-500 text-sm mb-3">Please enter a valid email</div>
+
+        <input x-model="form.password" type="password" placeholder="Password" class="w-full p-4 border rounded-lg mb-4 focus:ring-2 focus:ring-blue-500 outline-none">
+        <div x-show="$v.form.password.$invalid && $v.$touch" class="text-red-500 text-sm mb-6">
+          <small x-show="$v.form.password.min || $v.form.password.max">Password must be 8–20 characters</small>
+        </div>
+
+        <button @click="$v.validate(); isValid = !$v.$invalid"
+                class="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-lg hover:from-indigo-700 hover:to-purple-700 transition">
+          Submit
+        </button>
+
+        <div x-show="isValid" class="mt-4 text-center text-green-600 font-bold text-xl success-check">
+          ✓ Valid!
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- All Rules Demo Form -->
+<section class="py-24 bg-gray-50" id="demo">
+  <div class="container mx-auto max-w-5xl">
+    <h2 class="text-4xl font-bold text-center mb-14">Live Demo – Every Major Feature in Action</h2>
+    <!-- This is the magic box -->
+    <div class="mb-12 bg-gray-900 text-gray-100 p-8 rounded-2xl shadow-2xl border border-gray-800 relative" x-data="{ copied: false }">
+      <p class="text-lg mb-4 opacity-90">
+        This entire form is validated using <span class="font-bold text-cyan-400">just 11 lines</span> of real Alpidate rules:
+      </p>
+      <pre class="text-sm md:text-base overflow-x-auto"><code class="language-js">validations: {
+  'first_name'           : ['required', 'min:3'],
+  'last_name'            : ['required', 'min:3'],
+  'email'                : ['required', 'email'],
+  'delivery_note'        : ['requiredIf:express_delivery,true', 'max:10'],
+  'address'              : ['required', 'array'],
+  'address.*.name'       : ['required', 'min:2'],
+  'address.*.address'    : ['required', 'min:5'],
+  'address.*.phone'      : ['regex:^\\d{10}$']
+}</code></pre>
+      <div class="mt-6 flex flex-wrap gap-3 text-xs md:text-sm">
+        <span class="px-4 py-2 bg-cyan-600 bg-opacity-30 rounded-full">required / min / max</span>
+        <span class="px-4 py-2 bg-purple-600 bg-opacity-30 rounded-full">email</span>
+        <span class="px-4 py-2 bg-pink-600 bg-opacity-30 rounded-full">requiredIf:field,value</span>
+        <span class="px-4 py-2 bg-green-600 bg-opacity-30 rounded-full">array validation</span>
+        <span class="px-4 py-2 bg-orange-600 bg-opacity-30 rounded-full">address.*.field → nested arrays</span>
+        <span class="px-4 py-2 bg-yellow-600 bg-opacity-30 rounded-full">regex:</span>
+      </div>
+      <button @click="copied = true; navigator.clipboard.writeText(`validations: {
+  'first_name'           : ['required', 'min:3'],
+  'last_name'            : ['required', 'min:3'],
+  'email'                : ['required', 'email'],
+  'delivery_note'        : ['requiredIf:express_delivery,true', 'max:10'],
+  'address'              : ['required', 'array'],
+  'address.*.name'       : ['required', 'min:2'],
+  'address.*.address'    : ['required', 'min:5'],
+  'address.*.phone'      : ['regex:^\\d{10}$']
+}`); setTimeout(() => copied = false, 2000)" class="absolute top-4 right-4 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition text-sm">
+        <span x-text="copied ? 'Copied!' : 'Copy Rules'"></span>
+      </button>
+    </div>
+    <div x-data="{
+          first_name: '',
+          last_name: '',
+          email: '',
+          express_delivery: false,
+          delivery_note : '',
+          address: [
+            { name: '', address: '', phone: '' },
+            { name: '', address: '', phone: '' }
+          ],
+          validations: {
+            'first_name': ['required', 'min:3'],
+            'last_name': ['required', 'min:3'],
+            'delivery_note': ['requiredIf:express_delivery,true', 'max:10'],
+            'email': ['required', 'email'],
+            'address': ['required', 'array'],
+            'address.*.name': ['required', 'min:2'],
+            'address.*.address': ['required', 'min:5'],
+            'address.*.phone': ['regex:^\\d{10}$']
+          },
+          isValid: false,
+          init(){
+            this.$validation(this);
+          }
+        }"
+         class="bg-white p-10 rounded-2xl shadow-xl flex gap-6" x-bind:class="isValid ? 'border-4 border-green-500 transition-all duration-300' : ''">
+      <div class="grid gap-6 md:w-1/2 w-full content-start">
+        <div>
+          <label>
+            <span class="font-semibold">First Name</span>
+            <input x-model="first_name" type="text" class="mt-2 w-full p-3 border rounded"/>
+            <span x-show="$v.first_name.$invalid && $v.$touch">
+                <small x-show="$v.first_name.required" class="text-red-500">First Name is required</small>
+                <small x-show="!$v.first_name.required && $v.first_name.min" class="text-red-500">Minimum 3 characters</small>
+            </span>
+          </label>
+        </div>
+        <div>
+          <label>
+            <span class="font-semibold">Last Name</span>
+            <input x-model="last_name" type="text" class="mt-2 w-full p-3 border rounded"/>
+            <span x-show="$v.last_name.$invalid && $v.$touch">
+                <small x-show="$v.last_name.required" class="text-red-500">Last Name is required</small>
+                <small x-show="!$v.last_name.required && $v.last_name.min" class="text-red-500">Minimum 3 characters</small>
+            </span>
+          </label>
+        </div>
+        <div>
+          <label>
+            <span class="font-semibold">Express Delivery</span>
+            <input x-model="express_delivery" type="checkbox" class="mt-2 w-full p-3 border rounded"/>
+          </label>
+        </div>
+        <div>
+          <label>
+            <span class="font-semibold">Delivery Note</span>
+            <input x-model="delivery_note" type="text" class="mt-2 w-full p-3 border rounded"/>
+            <span x-show="$v.delivery_note.$invalid && $v.$touch">
+                <small x-show="$v.delivery_note.requiredIf" class="text-red-500">Delivery Note is required if Express Delivery is true</small>
+                <small x-show="!$v.delivery_note.requiredIf && $v.delivery_note.max" class="text-red-500">Maximum 10 characters</small>
+            </span>
+          </label>
+        </div>
+        <div>
+          <label>
+            <span class="font-semibold">Email</span>
+            <input x-model="email" type="text" class="mt-2 w-full p-3 border rounded"/>
+            <span x-show="$v.email.$invalid && $v.$touch">
+                <small x-show="$v.email.required" class="text-red-500">Email is required</small>
+                <small x-show="!$v.email.required && $v.email.email" class="text-red-500">Email is invalid</small>
+            </span>
+          </label>
+        </div>
+        <template x-for="(addr, idx) in address" :key="idx">
+          <div>
+            <h4 class="font-bold" x-text="'Address ' + (idx + 1)"></h4>
+            <label class="my-4 block">
+              <span class="font-semibold">Name</span>
+              <input x-model="addr.name" class="mt-2 w-full p-3 border rounded"/>
+              <span x-show="$v.address.each[idx].name.$invalid && $v.$touch">
+                  <small x-show="$v.address.each[idx].name.required" class="text-red-500">Name is required</small>
+                  <small x-show="!$v.address.each[idx].name.required && $v.address.each[idx].name.min" class="text-red-500">Minimum 2 characters</small>
+              </span>
+            </label>
+            <label class="my-4 block">
+              <span class="font-semibold">Address detail</span>
+              <input x-model="addr.address" class="mt-2 w-full p-3 border rounded"/>
+              <span x-show="$v.address.each[idx].address.$invalid && $v.$touch">
+                  <small x-show="$v.address.each[idx].address.required" class="text-red-500">Address is required</small>
+                  <small x-show="!$v.address.each[idx].address.required && $v.address.each[idx].address.min" class="text-red-500">Minimum 5 characters</small>
+              </span>
+            </label>
+            <label class="my-4 block">
+              <span class="font-semibold">Phone</span>
+              <input x-model="addr.phone" class="mt-2 w-full p-3 border rounded"/>
+              <span x-show="$v.address.each[idx].phone.$invalid && $v.$touch">
+                  <small x-show="$v.address.each[idx].phone.regex" class="text-red-500">Phone is invalid</small>
+              </span>
+            </label>
+          </div>
+        </template>
+        <button @click="$v.validate(); isValid = !$v.$invalid; if(isValid) setTimeout(() => isValid = false, 1500)" class="w-full py-3 bg-black text-white rounded-xl text-lg font-semibold">
+          Validate
+        </button>
+      </div>
+      <div class="w-1/2 md:block hidden">
+        <h2 class="mb-2 font-bold">$v Real-Time Output</h2>
+        <div x-data>
+          <pre><code x-html="syntaxHighlight(JSON.stringify($v, null, 2))"></code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Alpidate vs Others -->
+<section class="py-12 bg-gray-50">
+  <div class="container mx-auto max-w-6xl px-6">
+    <h2 class="text-4xl md:text-5xl font-bold text-center mb-16">
+      Alpidate vs Other Alpine Validation Solutions
+    </h2>
+
+    <div class="overflow-x-auto rounded-2xl shadow-2xl bg-white">
+      <table class="w-full text-left border-collapse">
+        <thead>
+        <tr class="bg-black text-white">
+          <th class="p-6"></th>
+          <th class="p-6 text-center font-bold text-lg">Alpidate</th>
+          <th class="p-6 text-center">simple-validate</th>
+          <th class="p-6 text-center">alpinejs-form-validation</th>
+          <th class="p-6 text-center">FormKit<br><span class="text-sm opacity-75">Alpine mode</span></th>
+          <th class="p-6 text-center">Pristine.js</th>
+        </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+        <tr class="hover:bg-gray-50 transition">
+          <td class="p-6 font-medium">Bundle size (min + gzip)</td>
+          <td class="p-6 text-center font-bold text-green-600">~4 KB</td>
+          <td class="p-6 text-center">~3 KB</td>
+          <td class="p-6 text-center">~4 KB</td>
+          <td class="p-6 text-center text-orange-600">~32–42 KB</td>
+          <td class="p-6 text-center">~5 KB</td>
+        </tr>
+        <tr class="hover:bg-gray-50 transition bg-gray-50">
+          <td class="p-6 font-medium">Zero dependencies</td>
+          <td class="p-6 text-center text-green-600 font-bold">Yes</td>
+          <td class="p-6 text-center text-green-600">Yes</td>
+          <td class="p-6 text-center text-green-600">Yes</td>
+          <td class="p-6 text-center text-red-600">No</td>
+          <td class="p-6 text-center text-green-600">Yes</td>
+        </tr>
+        <tr class="hover:bg-gray-50 transition">
+          <td class="p-6 font-medium">Nested & array validation</td>
+          <td class="p-6 text-center text-green-600 font-bold">Native (* syntax)</td>
+          <td class="p-6 text-center text-yellow-600">Manual loops</td>
+          <td class="p-6 text-center text-green-600">Yes</td>
+          <td class="p-6 text-center text-green-600">Yes</td>
+          <td class="p-6 text-center text-red-600">No</td>
+        </tr>
+        <tr class="hover:bg-gray-50 transition bg-gray-50">
+          <td class="p-6 font-medium">Syntax style</td>
+          <td class="p-6 text-center text-green-600 font-bold">rules: { email: ['required','email'] }</td>
+          <td class="p-6 text-center">x-validate attributes</td>
+          <td class="p-6 text-center">data-* attributes</td>
+          <td class="p-6 text-center">Component-based</td>
+          <td class="p-6 text-center">HTML5 + JS init</td>
+        </tr>
+        <tr class="hover:bg-gray-50 transition bg-gray-50">
+          <td class="p-6 font-medium">Learning curve</td>
+          <td class="p-6 text-center text-green-600 font-bold">2 minutes</td>
+          <td class="p-6 text-center text-green-600">2 minutes</td>
+          <td class="p-6 text-center">3 minutes</td>
+          <td class="p-6 text-center">15–30 minutes</td>
+          <td class="p-6 text-center">5 minutes</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="text-center mt-16">
+      <p class="text-2xl font-medium text-gray-800 leading-relaxed">
+        Clean Laravel-style syntax. Full power. Zero bloat.<br>
+        <span class="text-black font-bold text-3xl">Alpidate just feels right.</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="py-10 text-center text-gray-500 text-sm">
+  Built with ❤️ using Alpine.js & Alpidate by <a class="text-red-500" href="https://github.com/h7arash">Arash Hasanzade</a>
+  • <a class="text-blue-500" href="https://github.com/h7arash/alpidate#readme">Documentation →</a>
+</footer>
+
+</body>
+</html>
